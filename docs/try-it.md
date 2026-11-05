@@ -52,7 +52,7 @@ Only from outside, as a stranger would see it:
 target/release/odoo-doctor http://127.0.0.1:18019
 ```
 
-There are few findings here, and no grade. That is correct: a local address hides exposure problems, and nothing else is reachable.
+You should see no findings, a score of 100 marked **limited check**, and no grade. That is correct, even on this broken server: a local address hides exposure problems, and nothing else is reachable. It shows why a score from outside says little about the whole system.
 
 The same view, treated as if the address were public:
 
