@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odoo audit: http:&#x2f;&#x2f;127.0.0.1:18019</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1c1a; --muted: #6b6862; --line: #e4e2dc; --chip: #f0eee9;
+  --accent: #714b67; --critical: #b3261e; --high: #c8501e; --medium: #a87400; --low: #2d6f8f; --info: #6b6862; --good: #2e7d4f;
+  --code: #f3f1ec;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161514; --panel: #201f1d; --ink: #edeae4; --muted: #a09c94; --line: #33312e; --chip: #2b2a27;
+    --accent: #c79cbb; --critical: #ff7b72; --high: #ff9e64; --medium: #e3b341; --low: #6cb6d9; --info: #a09c94; --good: #5cc689;
+    --code: #2b2a27;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 32px 20px 72px; }
+code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; overflow-wrap: anywhere; }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+h1 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; font-weight: 700; }
+h2 { font-size: 18px; margin: 40px 0 14px; }
+.target { font-size: 24px; font-weight: 700; margin: 0; overflow-wrap: anywhere; line-height: 1.25; }
+.meta { color: var(--muted); margin-top: 6px; overflow-wrap: anywhere; }
+.summary { display: grid; grid-template-columns: 190px 1fr; gap: 16px; margin-top: 24px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+.score { text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.score b { font-size: 54px; line-height: 1; font-variant-numeric: tabular-nums; }
+.score span { color: var(--muted); }
+.grade-A b, .grade-B b { color: var(--good); } .grade-C b { color: var(--medium); } .grade-D b { color: var(--high); } .grade-F b { color: var(--critical); }
+.cat { display: grid; grid-template-columns: 110px 1fr 34px; gap: 10px; align-items: center; padding: 4px 0; }
+.track { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; }
+.fill { height: 100%; background: var(--good); border-radius: 4px; }
+.fill.mid { background: var(--medium); } .fill.bad { background: var(--critical); }
+.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.notice { margin-top: 16px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 8px 10px 8px 0; border-top: 1px solid var(--line); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+td:first-child { white-space: nowrap; font-weight: 600; width: 1%; padding-right: 22px; }
+.detail { color: var(--muted); overflow-wrap: anywhere; }
+.state { display: inline-block; width: 18px; font-weight: 700; }
+.state-ran { color: var(--good); } .state-partial { color: var(--medium); } .state-skipped { color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.filters button { font: inherit; font-size: 13px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; cursor: pointer; min-height: 32px; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.finding { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--sev); border-radius: 10px; margin-bottom: 10px; }
+.finding summary { display: grid; grid-template-columns: 76px 1fr auto; gap: 12px; padding: 13px 16px; cursor: pointer; align-items: baseline; list-style: none; }
+.finding summary::-webkit-details-marker { display: none; }
+.sev { font-size: 11px; font-weight: 700; letter-spacing: .05em; color: var(--sev); }
+.ftitle { font-weight: 600; }
+.fsummary { color: var(--muted); font-weight: 400; display: block; margin-top: 2px; }
+.fid { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.body { padding: 0 16px 16px 104px; }
+.body h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; }
+.body p { margin: 0; }
+.fix { color: var(--good); }
+ul.items { margin: 0; padding: 0; list-style: none; }
+ul.items li { padding: 3px 0; overflow-wrap: anywhere; }
+.sev-critical { --sev: var(--critical); } .sev-high { --sev: var(--high); } .sev-medium { --sev: var(--medium); } .sev-low { --sev: var(--low); } .sev-info { --sev: var(--info); }
+.empty { text-align: center; padding: 40px; color: var(--good); font-weight: 600; }
+footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) {
+  main { padding: 20px 16px 48px; }
+  .summary { grid-template-columns: 1fr; }
+  .finding summary { grid-template-columns: 1fr; gap: 2px; }
+  .fid { display: none; }
+  .body { padding-left: 16px; }
+  .cat { grid-template-columns: 96px 1fr 30px; }
+  td:first-child { white-space: normal; padding-right: 12px; }
+}
+@media print {
+  .filters { display: none; }
+  body { background: #fff; }
+  details > *:not(summary) { display: block; }
+  .finding { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Odoo audit</h1>
+<p class="target">http:&#x2f;&#x2f;127.0.0.1:18019</p>
+<div class="meta">
+  Docker (oddoc-lab-19-odoo-1) · Odoo 19.0-20260528 · database &lt;database&gt;<br>
+  2026-11-05T12:31:54.095991Z · odoo-doctor 0.1.0
+</div>
+
+<div class="summary">
+  <div class="panel score grade-F">
+    <b>19</b>
+    <span>out of 100 · grade F</span>
+  </div>
+  <div class="panel">
+    
+    <div class="cat">
+      <span>Security</span>
+      <div class="track"><div class="fill bad" style="width: 28%"></div></div>
+      <span class="num">28</span>
+    </div>
+    
+    <div class="cat">
+      <span>Reliability</span>
+      <div class="track"><div class="fill " style="width: 83%"></div></div>
+      <span class="num">83</span>
+    </div>
+    
+    <div class="cat">
+      <span>Performance</span>
+      <div class="track"><div class="fill " style="width: 86%"></div></div>
+      <span class="num">86</span>
+    </div>
+    
+    <div class="cat">
+      <span>Upgrade</span>
+      <div class="track"><div class="fill " style="width: 97%"></div></div>
+      <span class="num">97</span>
+    </div>
+    
+    <div class="cat">
+      <span>Code quality</span>
+      <div class="track"><div class="fill " style="width: 99%"></div></div>
+      <span class="num">99</span>
+    </div>
+    
+  </div>
+</div>
+
+<div class="notice">Logins and database names are masked in this report.</div>
+
+
+<h2>What was checked</h2>
+<div class="panel">
+  <table>
+  
+    <tr>
+      <td><span class="state state-partial">~</span>External exposure</td>
+      <td class="detail">http:&#x2f;&#x2f;127.0.0.1:18019: local address, so exposure checks were skipped</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>Odoo configuration</td>
+      <td class="detail">&#x2f;etc&#x2f;odoo&#x2f;odoo.conf</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>Odoo data (users, crons, mail, modules)</td>
+      <td class="detail">SQL (psql on container oddoc-lab-19-db-1)</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>PostgreSQL health</td>
+      <td class="detail">PostgreSQL 16.14</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>Custom module code</td>
+      <td class="detail">3 custom modules, 10 Python and 0 XML files, 93 lines</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>Server logs</td>
+      <td class="detail">docker logs oddoc-lab-19-odoo-1: 683 lines</td>
+    </tr>
+  
+    <tr>
+      <td><span class="state state-ran">✓</span>Host</td>
+      <td class="detail">disk usage of &#x2f;tmp&#x2f;odoo-data</td>
+    </tr>
+  
+  </table>
+</div>
+
+
+<h2>The system at a glance</h2>
+<div class="panel">
+  <table>
+  <tr><td>Active users</td><td class="detail">9 (9 internal, 9 administrators)</td></tr><tr><td>Installed modules</td><td class="detail">29 (2 not by Odoo S.A.)</td></tr><tr><td>Scheduled actions</td><td class="detail">13 active</td></tr><tr><td>Attachments</td><td class="detail">59</td></tr><tr><td>PostgreSQL</td><td class="detail">16.14</td></tr><tr><td>Database size</td><td class="detail">61 MB</td></tr><tr><td>Connections</td><td class="detail">3 of 100</td></tr><tr><td>Cache hit ratio</td><td class="detail">100.0%</td></tr><tr><td>Largest table</td><td class="detail">lab_order (33 MB)</td></tr><tr><td>Workers</td><td class="detail">0</td></tr>
+  </table>
+</div>
+
+
+<h2>Findings (35)</h2>
+
+<div class="filters" role="group" aria-label="Filter findings">
+  <button type="button" data-filter="all" aria-pressed="true">All</button>
+  <button type="button" data-filter="critical" aria-pressed="false">2 critical</button>
+  <button type="button" data-filter="high" aria-pressed="false">13 high</button>
+  <button type="button" data-filter="medium" aria-pressed="false">15 medium</button>
+  <button type="button" data-filter="low" aria-pressed="false">3 low</button>
+  <button type="button" data-filter="info" aria-pressed="false">2 info</button>
+  <button type="button" data-filter="security" aria-pressed="false">Security</button><button type="button" data-filter="reliability" aria-pressed="false">Reliability</button><button type="button" data-filter="performance" aria-pressed="false">Performance</button><button type="button" data-filter="upgrade" aria-pressed="false">Upgrade</button><button type="button" data-filter="quality" aria-pressed="false">Code quality</button>
+</div>
+
+<details class="finding sev-critical" data-severity="critical" data-category="security" open>
+  <summary>
+    <span class="sev">CRITICAL</span>
+    <span class="ftitle">Master password is weak or a default<span class="fsummary"><code>admin_passwd</code> is a common value or too short. The value is not shown here.</span></span>
+    <span class="fid mono">CFG001</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Anyone reaching the database manager can drop or download every database with this password.</p>
+    <h3>How to fix it</h3><p class="fix">Set a long random <code>admin_passwd</code>. Odoo stores a hash of it after you change it in the manager.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-critical" data-severity="critical" data-category="security" open>
+  <summary>
+    <span class="sev">CRITICAL</span>
+    <span class="ftitle">eval() or exec() on dynamic input<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY004 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>If the input can be influenced by a user, they can run any code on the server.</p>
+    <h3>How to fix it</h3><p class="fix">Parse the data explicitly, for example with <code>ast.literal_eval</code> or <code>json.loads</code>, or use <code>safe_eval</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>eval() on a non-literal value</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:50</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="performance" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Running in threaded mode (workers = 0)<span class="fsummary"><code>workers = 0</code>, or not set.</span></span>
+    <span class="fid mono">CFG006</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>A single process handles all requests, so one slow report slows down every user, and memory limits do not apply.</p>
+    <h3>How to fix it</h3><p class="fix">Set <code>workers</code> to about 2 × CPU cores + 1, and configure memory limits and a websocket proxy.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Developer mode is enabled on the server<span class="fsummary"><code>dev_mode = reload</code>.</span></span>
+    <span class="fid mono">CFG007</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p><code>dev_mode</code> reloads code and can expose debugging tools. It is meant for development only.</p>
+    <h3>How to fix it</h3><p class="fix">Remove <code>dev_mode</code> from odoo.conf and from the start command.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Odoo connects to PostgreSQL as a superuser<span class="fsummary">The role Odoo connects with is a PostgreSQL superuser.</span></span>
+    <span class="fid mono">CFG009</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>If Odoo is compromised, the attacker controls the whole PostgreSQL server, and can often run operating system commands.</p>
+    <h3>How to fix it</h3><p class="fix">Create a dedicated role with CREATEDB and no SUPERUSER, and reassign database ownership.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Module grants access without a group<span class="fsummary">2 occurrence(s) in 2 module(s).</span></span>
+    <span class="fid mono">CSV001</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>An access line with an empty group applies to everyone, including write and delete rights if it grants them.</p>
+    <h3>How to fix it</h3><p class="fix">Set <code>group_id</code> to the narrowest suitable group.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>lab_broken.model_lab_order: write access with no group</li><li>&lt;database&gt;.order: write access with no group</li></ul>
+    <h3>Where (2)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_acl_legacy&#x2f;security&#x2f;ir.model.access.csv:2</li><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_acl_new&#x2f;security&#x2f;ir.access.csv:2</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="reliability" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Scheduled actions are failing<span class="fsummary">1 scheduled action(s) have recent failures.</span></span>
+    <span class="fid mono">OPS001</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Recurring work such as invoicing, mail or reminders is not happening. Odoo can deactivate a cron that keeps failing.</p>
+    <h3>How to fix it</h3><p class="fix">Read the server log around the failure time and fix the cause.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>Lab broken cron (1 failure(s))</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">SQL built with string formatting<span class="fsummary">2 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY001 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>If any value comes from a user, this is SQL injection, and the attacker can read or change any data.</p>
+    <h3>How to fix it</h3><p class="fix">Pass values as parameters: <code>cr.execute(&quot;... WHERE id = %s&quot;, (id,))</code>, or use <code>odoo.tools.SQL</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>f&quot;SELECT id FROM lab_order WHERE name = &#x27;{name}&#x27;&quot;</li><li>&quot;SELECT id FROM lab_order WHERE name = &#x27;%s&#x27;&quot; % name</li></ul>
+    <h3>Where (2)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:22</li><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:26</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Unsafe deserialization<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY005 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p><code>pickle</code> and unsafe YAML loading can run code hidden in the data.</p>
+    <h3>How to fix it</h3><p class="fix">Use JSON, or <code>yaml.safe_load</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>pickle.loads()</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:47</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Shell command with dynamic input<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY006 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>A value containing shell syntax can run arbitrary commands on the server.</p>
+    <h3>How to fix it</h3><p class="fix">Use <code>subprocess.run([...])</code> with a list of arguments and without <code>shell=True</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>subprocess.run(shell=True)</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:44</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">TLS verification disabled<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY007</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>With <code>verify=False</code>, anyone on the network path can read or change this traffic.</p>
+    <h3>How to fix it</h3><p class="fix">Remove <code>verify=False</code>, and install the right CA certificate if needed.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>requests.get(verify=False)</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:41</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Hardcoded secret<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY008 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Anyone with access to the repository or a backup gets the credential, and rotating it needs a code change.</p>
+    <h3>How to fix it</h3><p class="fix">Rotate the secret, then move it to <code>ir.config_parameter</code>, environment variables or a secrets manager.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>API_KEY = &lt;recognized credential format&gt;</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:9</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="reliability" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Manual cr.commit()<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY010 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Committing mid-request breaks atomicity, so an error later leaves half-written data, and it also breaks tests.</p>
+    <h3>How to fix it</h3><p class="fix">Remove it, or isolate batch work in its own cursor with <code>self.env.registry.cursor()</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>self.env.cr.commit()</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:34</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Too many administrators<span class="fsummary">9 active administrators, out of 9 internal users.</span></span>
+    <span class="fid mono">SEC001</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Each administrator can read all data and change any setting. More administrators means more accounts that can be compromised.</p>
+    <h3>How to fix it</h3><p class="fix">Keep a small number of Settings administrators, and use narrower groups for everyone else.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>a***</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-high" data-severity="high" data-category="security" open>
+  <summary>
+    <span class="sev">HIGH</span>
+    <span class="ftitle">Model access granted to everyone<span class="fsummary">1 custom access rule(s) grant write rights with no group.</span></span>
+    <span class="fid mono">SEC008</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>An access rule with no group applies to all users, including portal and public users where the route allows it.</p>
+    <h3>How to fix it</h3><p class="fix">Add a group to the rule, usually <code>base.group_user</code>, and keep write and delete as narrow as possible.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>&lt;database&gt;.order: write create delete (module lab_acl_legacy)</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Database manager is enabled<span class="fsummary"><code>list_db</code> is enabled.</span></span>
+    <span class="fid mono">CFG004</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p><code>list_db</code> exposes database management pages to everyone who can reach Odoo.</p>
+    <h3>How to fix it</h3><p class="fix">Set <code>list_db = False</code> in production.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="performance">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Debug logging is enabled<span class="fsummary"><code>log_level = debug</code>.</span></span>
+    <span class="fid mono">CFG008</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Debug logs slow Odoo down, fill the disk, and can record sensitive values.</p>
+    <h3>How to fix it</h3><p class="fix">Set <code>log_level = info</code> or <code>warn</code>.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="reliability">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Emails failed to send<span class="fsummary">30 email(s) failed in the last 30 days.</span></span>
+    <span class="fid mono">OPS003</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Customers or staff are not getting these messages, and nothing warns them.</p>
+    <h3>How to fix it</h3><p class="fix">Open Settings &gt; Technical &gt; Emails, read the failure reason, and fix the server or address.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="performance">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Frequent sequential scans on large tables<span class="fsummary">1 large table(s) are read mainly by sequential scan.</span></span>
+    <span class="fid mono">PG010 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>PostgreSQL reads the whole table for each query, which probably means an index is missing.</p>
+    <h3>How to fix it</h3><p class="fix">Find the queries with <code>pg_stat_statements</code>, then add an index or <code>index=True</code> on the field.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>lab_order: 200000 rows, 15 scans, 53333 rows read per scan</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Public route uses sudo()<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY002 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>This code runs with full rights for anyone on the internet, so one mistake exposes data that should be private.</p>
+    <h3>How to fix it</h3><p class="fix">Check access explicitly, limit which fields are returned, and avoid <code>sudo()</code> where possible.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>sudo() inside a p*** route</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;controllers&#x2f;main.py:8</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Public POST route without CSRF protection<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY003 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Another site can trigger this route from a visitor&#x27;s browser.</p>
+    <h3>How to fix it</h3><p class="fix">Remove <code>csrf=False</code> unless this is a webhook that verifies a signature.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>orders(): auth=&#x27;p***&#x27;, csrf=False</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;controllers&#x2f;main.py:6</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">HTML field with sanitization disabled<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY009</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p><code>sanitize=False</code> stores HTML as written, which allows stored XSS if users can edit the field.</p>
+    <h3>How to fix it</h3><p class="fix">Keep sanitizing unless the content is only written by trusted code.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>fields.Html(sanitize=False)</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:19</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="reliability">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">HTTP request without a timeout<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY011</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>If the remote service hangs, this worker hangs with it until the time limit kills it.</p>
+    <h3>How to fix it</h3><p class="fix">Always pass <code>timeout=</code>, for example <code>timeout=10</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>requests.get() without timeout</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:41</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="performance">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">ORM search inside a loop<span class="fsummary">1 occurrence(s) in 1 module(s).</span></span>
+    <span class="fid mono">PY012 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>This runs one query per record (N+1), which works in testing and becomes slow in production.</p>
+    <h3>How to fix it</h3><p class="fix">Run one search before the loop and map the results, or use <code>read_group</code>/<code>_read_group</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>.search() inside a loop</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_broken&#x2f;models&#x2f;order.py:38</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Administrators without two-factor authentication<span class="fsummary">9 of 9 administrators have no two-factor authentication.</span></span>
+    <span class="fid mono">SEC003</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>A leaked or reused password is enough to take over the whole system.</p>
+    <h3>How to fix it</h3><p class="fix">Install <code>auth_totp</code> and require two-factor authentication for administrators.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>a***</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li><li>e***@example.com</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Default <code>admin</code> login is active<span class="fsummary">An active user has the login <code>a***</code>.</span></span>
+    <span class="fid mono">SEC004</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Attackers try this login first, so they only have to guess the password.</p>
+    <h3>How to fix it</h3><p class="fix">Rename the account to a personal login, or create named administrators and archive it.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Outgoing mail server without encryption<span class="fsummary">1 active mail server(s) do not encrypt.</span></span>
+    <span class="fid mono">SEC009</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Mail credentials and message content travel in clear text.</p>
+    <h3>How to fix it</h3><p class="fix">Use STARTTLS or SSL/TLS on the mail server.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>Lab SMTP</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">web.base.url uses plain HTTP<span class="fsummary">web.base.url = http://insecure.example.com</span></span>
+    <span class="fid mono">SEC010</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Links in emails and portal pages use this address, which sends users to plain HTTP.</p>
+    <h3>How to fix it</h3><p class="fix">Set <code>web.base.url</code> to the HTTPS address and set <code>web.base.url.freeze</code> to True.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="security">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle">Public signup is enabled in settings<span class="fsummary">auth_signup.invitation_scope = b2c</span></span>
+    <span class="fid mono">SEC011</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p><code>auth_signup.invitation_scope = b2c</code> lets anyone create a portal account.</p>
+    <h3>How to fix it</h3><p class="fix">Change Customer Account to &#x27;On invitation&#x27; unless you need open signup.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-medium" data-severity="medium" data-category="upgrade">
+  <summary>
+    <span class="sev">MEDIUM</span>
+    <span class="ftitle"><code>ir.model.access</code> and <code>ir.rule</code> are gone in Odoo 20<span class="fsummary">1 occurrence(s) in 1 module(s). This must change before you move to Odoo 20.</span></span>
+    <span class="fid mono">UPG001</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Odoo 20 replaces both with the single <code>ir.access</code> model and <code>ir.access.csv</code> file. Loading the old files fails with a KeyError.</p>
+    <h3>How to fix it</h3><p class="fix">Rewrite <code>security/ir.model.access.csv</code> and record rules as <code>security/ir.access.csv</code> (id, name, model_id, group_id/id, operation, domain).</p>
+    <h3>Evidence</h3><ul class="items mono"><li>ir.model.access.csv</li></ul>
+    <h3>Where (1)</h3>
+    <ul class="items mono"><li>&#x2f;mnt&#x2f;extra-addons&#x2f;lab_acl_legacy&#x2f;security&#x2f;ir.model.access.csv:1</li>
+    </ul>
+  </div>
+</details>
+
+<details class="finding sev-low" data-severity="low" data-category="quality">
+  <summary>
+    <span class="sev">LOW</span>
+    <span class="ftitle">Manifest has no license<span class="fsummary">1 module(s) have no license key.</span></span>
+    <span class="fid mono">MOD002</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Odoo warns about it and assumes LGPL-3, which may not be what you intended.</p>
+    <h3>How to fix it</h3><p class="fix">Add <code>license</code> to <code>__manifest__.py</code>.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>lab_broken</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-low" data-severity="low" data-category="performance">
+  <summary>
+    <span class="sev">LOW</span>
+    <span class="ftitle">Foreign keys without an index on large tables<span class="fsummary">1 foreign key column(s) have no index.</span></span>
+    <span class="fid mono">PG011 · probable</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Deleting or updating the parent record scans this whole table, and joins on the column get slower.</p>
+    <h3>How to fix it</h3><p class="fix">Add <code>index=True</code> on the many2one field if it is used for filtering or the parent records change.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>lab_order.partner_id</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-low" data-severity="low" data-category="security">
+  <summary>
+    <span class="sev">LOW</span>
+    <span class="ftitle">Administrators have API keys<span class="fsummary">1 administrator(s) have API keys.</span></span>
+    <span class="fid mono">SEC007</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>An API key bypasses two-factor authentication, and a leaked one grants that administrator&#x27;s full rights.</p>
+    <h3>How to fix it</h3><p class="fix">Review the keys and delete unused ones. Use a dedicated user with narrow rights for integrations.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>a*** (1 key(s))</li></ul>
+    
+  </div>
+</details>
+
+<details class="finding sev-info" data-severity="info" data-category="performance">
+  <summary>
+    <span class="sev">INFO</span>
+    <span class="ftitle">Query statistics are not enabled<span class="fsummary"><code>pg_stat_statements</code> is not installed in this database.</span></span>
+    <span class="fid mono">PG015</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>Without <code>pg_stat_statements</code>, this tool cannot show you the slowest queries.</p>
+    <h3>How to fix it</h3><p class="fix">Add it to <code>shared_preload_libraries</code>, restart, and run <code>CREATE EXTENSION pg_stat_statements</code>.</p>
+    
+    
+  </div>
+</details>
+
+<details class="finding sev-info" data-severity="info" data-category="upgrade">
+  <summary>
+    <span class="sev">INFO</span>
+    <span class="ftitle">Installed modules need work for the upgrade<span class="fsummary">1 of 3 custom module(s) need work to reach Odoo 20.</span></span>
+    <span class="fid mono">UPG019</span>
+  </summary>
+  <div class="body">
+    <h3>Why it matters</h3><p>This summary counts the modules with at least one upgrade finding, to help size the migration.</p>
+    <h3>How to fix it</h3><p class="fix">Handle the upgrade findings in this report, module by module.</p>
+    <h3>Evidence</h3><ul class="items mono"><li>lab_acl_legacy</li></ul>
+    
+  </div>
+</details>
+
+
+
+<footer>odoo-doctor only reads. It changed nothing on this system. A clean result covers only the checks listed above, and it does not prove the system is secure.</footer>
+</main>
+<script>
+document.querySelectorAll('[data-filter]').forEach(function (button) {
+  button.addEventListener('click', function () {
+    var value = button.dataset.filter;
+    document.querySelectorAll('[data-filter]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
+    document.querySelectorAll('.finding').forEach(function (f) {
+      f.hidden = !(value === 'all' || f.dataset.severity === value || f.dataset.category === value);
+    });
+  });
+});
+window.addEventListener('beforeprint', function () { document.querySelectorAll('details').forEach(function (d) { d.open = true; }); });
+</script>
+</body>
+</html>
