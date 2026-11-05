@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13, windows-latest, windows-11-arm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install LLVM for ring on Windows ARM
+        if: matrix.os == 'windows-11-arm'
+        shell: pwsh
+        run: |
+          choco install llvm --no-progress -y
+          "C:\Program Files\LLVM\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+      - run: cargo test
+      - run: cargo build --release
+      - name: Works with no Odoo around, on this system
+        shell: bash
+        run: |
+          bin=target/release/odoo-doctor
+          $bin --version
+          $bin checks | tail -1
+          $bin explain PY001 | head -1
+          $bin --addons lab/addons --html report.html --json report.json --sarif report.sarif --no-input
+          test -s report.html && test -s report.json && test -s report.sarif
+          grep -q 'lab_broken' report.html
+          set +e
+          $bin --addons lab/addons --fail-on high --no-html --no-input > /dev/null
+          [ $? -eq 1 ] || { echo '--fail-on should exit 1'; exit 1; }
+          $bin http://127.0.0.1:1 --no-html --no-input > /dev/null
+          [ $? -eq 2 ] || { echo 'an unreachable site should exit 2'; exit 1; }
+          exit 0
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+      - name: Free disk space for the Odoo images
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools
+      - run: cargo build --release
+      - run: cargo build --release --target x86_64-unknown-linux-musl
+      - name: Start one broken Odoo per supported version
+        run: |
+          lab/up.sh 17
+          lab/up.sh 18
+          lab/up.sh 19
+          lab/up.sh 20
+          sleep 15
+      - run: tests/integration/run.sh target/release/odoo-doctor target/x86_64-unknown-linux-musl/release/odoo-doctor
+
+  supply-chain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
