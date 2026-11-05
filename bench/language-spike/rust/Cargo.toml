@@ -1,0 +1,18 @@
+[package]
+name = "spike"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+ruff_python_parser = "0.0.20"
+ruff_python_ast = "0.0.20"
+ruff_text_size = "0.0.20"
+rayon = "1"
+walkdir = "2"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

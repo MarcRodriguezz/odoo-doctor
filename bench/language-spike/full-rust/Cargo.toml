@@ -1,0 +1,22 @@
+[package]
+name = "proto"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+postgres = "0.19"
+tokio-postgres-rustls = "0.13"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+webpki-roots = "1"
+minijinja = { version = "2", default-features = false, features = ["builtins", "serde"] }
+serde_json = "1"
+ruff_python_parser = "0.0.20"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

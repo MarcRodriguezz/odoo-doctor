@@ -1,0 +1,10 @@
+bench/language-spike/corpus/
+bench/language-spike/**/target/
+bench/language-spike/**/bin/
+dist/
+*.test
+.DS_Store
+__pycache__/
+bench/language-spike/results/
+odoo-doctor-report.html
+target/
