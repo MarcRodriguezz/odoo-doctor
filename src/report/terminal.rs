@@ -48,11 +48,23 @@ pub fn render(report: &Report, verbose: bool) -> String {
         let _ = writeln!(o, "{DIM}{}{RESET}", identity.join(" · "));
     }
     let color = score_color(report.score);
-    let _ = writeln!(
-        o,
-        "\n{color}{}/100  grade {}{RESET}",
-        report.score, report.grade
-    );
+    match &report.limited {
+        Some(note) => {
+            let _ = writeln!(
+                o,
+                "\n{color}{}/100{RESET}  \x1b[33mlimited check{RESET}",
+                report.score
+            );
+            let _ = writeln!(o, "\x1b[33m{note}{RESET}");
+        }
+        None => {
+            let _ = writeln!(
+                o,
+                "\n{color}{}/100  grade {}{RESET}",
+                report.score, report.grade
+            );
+        }
+    }
     let c = &report.counts;
     let _ = writeln!(
         o,

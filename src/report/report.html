@@ -38,6 +38,7 @@ h2 { font-size: 18px; margin: 40px 0 14px; }
 .fill { height: 100%; background: var(--good); border-radius: 4px; }
 .fill.mid { background: var(--medium); } .fill.bad { background: var(--critical); }
 .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.notice.warn { color: var(--medium); border-color: var(--medium); }
 .notice { margin-top: 16px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
 table { width: 100%; border-collapse: collapse; }
 td { padding: 8px 10px 8px 0; border-top: 1px solid var(--line); vertical-align: top; }
@@ -92,9 +93,9 @@ footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
 </div>
 
 <div class="summary">
-  <div class="panel score grade-{{ r.grade }}">
+  <div class="panel score{% if not r.limited %} grade-{{ r.grade }}{% endif %}">
     <b>{{ r.score }}</b>
-    <span>out of 100 · grade {{ r.grade }}</span>
+    <span>out of 100{% if r.limited %} · limited check{% else %} · grade {{ r.grade }}{% endif %}</span>
   </div>
   <div class="panel">
     {% for c in r.categories %}
@@ -107,6 +108,7 @@ footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
   </div>
 </div>
 
+{% if r.limited %}<div class="notice warn">{{ r.limited }} See "What was checked" below for how to see more.</div>{% endif %}
 {% if r.redacted %}<div class="notice">Logins and database names are masked in this report.</div>
 {% else %}<div class="notice">This report can contain logins and database names. Use <code>--redact</code> before sharing it outside your team.</div>{% endif %}
 

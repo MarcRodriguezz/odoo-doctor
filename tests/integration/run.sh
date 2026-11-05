@@ -169,6 +169,8 @@ echo "== From outside"
 "$BIN" http://127.0.0.1:18019 --no-html --json e.json --no-input >/dev/null 2>&1
 expect_layer e.json external partial
 expect_layer e.json code skipped
+python3 -I -c "import json;r=json.load(open('e.json'));assert r['grade']=='–' and r['limited'],r['grade']" && ok "a view from outside gets no grade" || ko "a view from outside should get no grade"
+python3 -I -c "import json;r=json.load(open('d19.json'));assert r['grade']=='F' and not r['limited'],r['grade']" && ok "a full audit gets a grade" || ko "a full audit should get a grade"
 "$BIN" http://127.0.0.1:18019 --treat-as-public --no-port-probe --no-html --json ep.json --no-input >/dev/null 2>&1
 expect_ids ep.json "public view" EXT001 EXT002 EXT004
 "$BIN" http://127.0.0.1:1 --no-html --no-input >/dev/null 2>&1

@@ -102,7 +102,7 @@ The HTML report can include logins and database names. Use `--redact` before sha
 
 The score starts at 100 and falls with each finding, weighted by severity. A critical finding caps the grade at D. Findings marked **probable** come from a code pattern, so a person should confirm them.
 
-Every report lists **what was checked and what was not**, with the reason. A good score covers only what was examined, and it does not prove the system is secure.
+Every report lists **what was checked and what was not**, with the reason. If fewer than four areas could be examined, for example with only an address and no credentials, you get a score but no grade. Even a good grade covers only what was examined, and it does not prove the system is secure.
 
 Code in modules that are not installed is downgraded, since it cannot cause harm until someone installs it. On hosted Odoo, settings only the operator controls are hidden.
 

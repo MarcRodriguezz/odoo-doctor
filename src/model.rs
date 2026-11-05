@@ -199,6 +199,8 @@ pub struct Report {
     pub upgrade_target: Option<u32>,
     pub score: u32,
     pub grade: String,
+    /// Set when too little was examined for a grade to mean anything.
+    pub limited: Option<String>,
     pub counts: Counts,
     pub categories: Vec<CategoryScore>,
     pub layers: Vec<LayerStatus>,

@@ -7,6 +7,9 @@ use crate::collect::Snapshot;
 use crate::model::{self, Finding, Layer, LayerState, LayerStatus, Report};
 use time::format_description::well_known::Rfc3339;
 
+/// Fewer areas than this and a report shows its score, but gives no grade.
+const MIN_LAYERS_FOR_GRADE: usize = 4;
+
 fn bytes_label(bytes: i64) -> String {
     let gb = bytes as f64 / 1_073_741_824.0;
     if gb >= 1.0 {
@@ -231,6 +234,18 @@ pub fn build(s: &Snapshot, findings: Vec<Finding>, redacted: bool) -> Report {
         .map(|e| e.base_url.clone())
         .or_else(|| s.code.as_ref().map(|c| c.roots.join(", ")))
         .unwrap_or_else(|| s.deployment.clone());
+    let layers: Vec<LayerStatus> = Layer::ALL.iter().map(|l| layer_status(s, *l)).collect();
+    let examined = layers
+        .iter()
+        .filter(|l| l.state != LayerState::Skipped)
+        .count();
+    // A clean result from a narrow look must not read like a clean bill of health.
+    let limited = (examined < MIN_LAYERS_FOR_GRADE).then(|| {
+        format!(
+            "Only {examined} of {} areas could be checked, so this is not a grade for the whole system.",
+            layers.len()
+        )
+    });
     let mut report = Report {
         schema_version: 1,
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
@@ -241,10 +256,15 @@ pub fn build(s: &Snapshot, findings: Vec<Finding>, redacted: bool) -> Report {
         database: s.database.clone(),
         upgrade_target: s.code.as_ref().and_then(|_| checks::target_major(s)),
         score,
-        grade: model::grade(score, &findings).to_string(),
+        grade: if limited.is_some() {
+            "–".to_string()
+        } else {
+            model::grade(score, &findings).to_string()
+        },
+        limited,
         counts: model::count(&findings),
         categories: model::category_scores(&findings),
-        layers: Layer::ALL.iter().map(|l| layer_status(s, *l)).collect(),
+        layers,
         facts: facts(s),
         findings,
         redacted: false,
@@ -334,6 +354,35 @@ mod tests {
         assert!(!json.contains("acme_prod"));
         assert!(json.contains("a***@acme.com"));
         assert!(report.redacted);
+    }
+
+    #[test]
+    fn a_narrow_audit_gets_no_grade_even_when_clean() {
+        let narrow = build(&Snapshot::default(), vec![], false);
+        assert_eq!(narrow.score, 100);
+        assert_eq!(narrow.grade, "–");
+        assert!(narrow
+            .limited
+            .as_deref()
+            .unwrap()
+            .starts_with("Only 0 of 7"));
+        let page = html(&narrow).unwrap();
+        assert!(page.contains("not a grade for the whole system"));
+        assert!(!page.contains("grade A"));
+    }
+
+    #[test]
+    fn a_broad_audit_gets_a_grade() {
+        let s = Snapshot {
+            conf: Some(conf::parse("/x", "[options]\n")),
+            odoo: Some(OdooData::default()),
+            pg: Some(crate::collect::pg::PgData::default()),
+            logs: Some(crate::collect::logs::LogData::default()),
+            ..Snapshot::default()
+        };
+        let report = build(&s, vec![], false);
+        assert_eq!(report.grade, "A");
+        assert!(report.limited.is_none());
     }
 
     #[test]
