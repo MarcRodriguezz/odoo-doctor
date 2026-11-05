@@ -73,6 +73,7 @@ Running on real code exposed mistakes unit tests had not:
 
 ## What is not verified
 
+- **A real Odoo on Windows.** CI runs unit tests and code-only audits on Windows, but no Odoo server there.
 - **Real Odoo.sh.** The simulation follows Odoo's documented layout (`~/src/user`, `~/logs/odoo.log`, `psql`, `ODOO_STAGE`), but it is a stand-in. The real environment may differ.
 - **Real Odoo Online.** The API path is tested on self-hosted Odoo. Hosted databases may restrict some models.
 - **A production-sized database.** The labs are small, with 200,000 rows in the largest custom table. Queries have a 30-second timeout, and a section that fails is reported as not read.

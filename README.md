@@ -53,6 +53,8 @@ irm https://raw.githubusercontent.com/MarcRodriguezz/odoo-doctor/main/install.ps
 
 Neither needs root or administrator rights. Both verify the download's SHA-256 checksum. You can also [download a binary](https://github.com/MarcRodriguezz/odoo-doctor/releases) yourself. There are builds for x86-64 and ARM64.
 
+**Want to try it first?** [This guide](docs/try-it.md) walks you through auditing a deliberately broken Odoo on your own machine.
+
 ## Use
 
 | Your setup | Command |
@@ -129,8 +131,8 @@ Exit codes: `0` completed, `1` a finding reached `--fail-on`, `2` nothing could 
 | Odoo API (JSON-RPC on 17 and 18, JSON-2 on 19 and 20) | Tested against real instances with real API keys |
 | **Odoo.sh** | Tested against a simulated build with the documented layout. **Not yet tested on a real Odoo.sh project** |
 | **Odoo Online** | Uses the tested API path. **Not yet tested on a real Odoo Online database.** Odoo limits API access to its Custom plan |
-| Linux and macOS, x86-64 and ARM64 | Binaries built, and run on these systems |
-| **Windows** | Binaries built. CI runs tests on real Windows machines. On Windows, a native install is read directly, and the disk check is not available yet |
+| Linux and macOS, x86-64 and ARM64 | Tests pass in CI on real machines. The full suite against real Odoo runs on Linux x86-64 |
+| **Windows** | Unit tests and code-only runs pass on real Windows machines (x86-64 and ARM64). **A real Odoo on Windows is not yet tested.** Its native install is read directly, and the disk check is not available yet |
 
 See [docs/testing.md](docs/testing.md) for what the tests prove and what they do not.
 
