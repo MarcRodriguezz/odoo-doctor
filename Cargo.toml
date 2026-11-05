@@ -1,0 +1,40 @@
+[package]
+name = "odoo-doctor"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Read-only health, security and upgrade audit for any Odoo deployment"
+license = "MIT"
+repository = "https://github.com/MarcRodriguezz/odoo-doctor"
+keywords = ["odoo", "audit", "security", "postgres", "cli"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+anstream = "0.6"
+clap = { version = "4", features = ["derive", "env"] }
+minijinja = { version = "2", default-features = false, features = ["builtins", "serde", "json"] }
+postgres = "0.19"
+quick-xml = "0.41"
+rayon = "1"
+# Pinned exactly: Ruff's parser is an internal crate with no API stability. See docs/adr/0001-language.md.
+ruff_python_ast = "=0.0.20"
+ruff_python_parser = "=0.0.20"
+ruff_text_size = "=0.0.20"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tar = { version = "0.4", default-features = false }
+time = { version = "0.3", features = ["formatting"] }
+tokio-postgres-rustls = "0.13"
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+walkdir = "2"
+webpki-roots = "1"
+x509-parser = "0.18"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+# Unwinding stays on: one malformed source file must not abort a whole audit.
+panic = "unwind"
