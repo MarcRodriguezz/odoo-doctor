@@ -1,0 +1,67 @@
+name: Install check
+
+# Runs the install commands from the README against the published release.
+# Start it by hand after a release: it needs a public repository and a release to download.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unix:
+    name: install (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install as the README says
+        run: curl -fsSL https://raw.githubusercontent.com/MarcRodriguezz/odoo-doctor/main/install.sh | sh
+      - name: Run it
+        run: |
+          ~/.local/bin/odoo-doctor --version
+          ~/.local/bin/odoo-doctor --addons lab/addons --html report.html --no-input
+          grep -q lab_broken report.html
+
+  alpine:
+    name: install (alpine, no glibc)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install and run in a minimal container
+        run: |
+          docker run --rm alpine:3 sh -euc '
+            apk add --no-cache -q curl
+            curl -fsSL https://raw.githubusercontent.com/MarcRodriguezz/odoo-doctor/main/install.sh | sh
+            ~/.local/bin/odoo-doctor --version
+          '
+
+  windows:
+    name: install (${{ matrix.os }}, ${{ matrix.shell }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-11-arm]
+        shell: [pwsh, powershell]
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install as the README says
+        run: irm https://raw.githubusercontent.com/MarcRodriguezz/odoo-doctor/main/install.ps1 | iex
+      - name: Run it
+        run: |
+          $bin = Join-Path $env:LOCALAPPDATA 'odoo-doctor\odoo-doctor.exe'
+          & $bin --version
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & $bin --addons lab/addons --html report.html --no-input
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if (-not (Select-String -Quiet -Path report.html -Pattern lab_broken)) { exit 1 }
+      - name: It is on the user PATH
+        run: |
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+          if (($userPath -split ';') -notcontains (Join-Path $env:LOCALAPPDATA 'odoo-doctor')) { exit 1 }

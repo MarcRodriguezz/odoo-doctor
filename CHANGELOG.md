@@ -9,4 +9,4 @@ First release.
 - Terminal, HTML, JSON and SARIF reports.
 - Binaries for Linux, macOS and Windows, on x86-64 and ARM64.
 
-Not yet tested on real Odoo.sh or Odoo Online. See [docs/testing.md](docs/testing.md).
+Not yet tested on real Odoo.sh or Odoo Online. See [what the tests prove](https://github.com/MarcRodriguezz/odoo-doctor/blob/main/docs/testing.md).

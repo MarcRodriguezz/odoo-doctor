@@ -1,0 +1,40 @@
+name: Bug report
+description: A crash, a wrong result or a problem installing odoo-doctor.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This issue is public.** Remove anything private. To report a vulnerability, follow [SECURITY.md](https://github.com/MarcRodriguezz/odoo-doctor/blob/main/SECURITY.md) instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      description: Replace addresses and keys with placeholders.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or error message
+      render: text
+  - type: input
+    id: tool-version
+    attributes:
+      label: odoo-doctor version
+      description: The output of `odoo-doctor --version`.
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System running odoo-doctor, and Odoo version
+      placeholder: Ubuntu 24.04 x86-64, Odoo 19 in Docker
+    validations:
+      required: true

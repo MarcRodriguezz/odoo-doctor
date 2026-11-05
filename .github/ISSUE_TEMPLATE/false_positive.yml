@@ -1,0 +1,51 @@
+name: False positive
+description: A check flagged something that is not a problem.
+title: "[False positive] "
+labels: ["false positive"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        False positives are bugs, and these are the most useful reports you can send.
+
+        **This issue is public.** Reduce the code to the smallest piece that triggers the finding, and remove anything private.
+  - type: input
+    id: check
+    attributes:
+      label: Check ID
+      placeholder: PY001
+    validations:
+      required: true
+  - type: input
+    id: tool-version
+    attributes:
+      label: odoo-doctor version
+      description: The output of `odoo-doctor --version`.
+    validations:
+      required: true
+  - type: input
+    id: odoo-version
+    attributes:
+      label: Odoo version
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: The smallest code or configuration that triggers it
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is this not a problem?
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you submit
+      options:
+        - label: I removed passwords, API keys, addresses and anything else private.
+          required: true

@@ -142,9 +142,20 @@ Written in Rust, using [Ruff](https://github.com/astral-sh/ruff)'s Python parser
 
 [ADR 0001](docs/adr/0001-language.md) explains the language choice with measurements: Rust, Go and Python each analyzed 1.1 million lines of real Odoo code. Parsing took 0.34 s in Rust, 3.45 s in Python and 8.62 s in pure Go, with identical results.
 
+## Help test it
+
+This is a young project, and a few environments have never seen it. You can help most by trying it on:
+
+- A real **Odoo.sh** project
+- A real **Odoo Online** database
+- **Odoo on Windows**
+- A **large production database**, using `--redact` if you share anything
+
+Then [send a compatibility report](https://github.com/MarcRodriguezz/odoo-doctor/issues/new?template=compatibility.yml), even if everything worked. A finding that looks wrong is just as useful: [report a false positive](https://github.com/MarcRodriguezz/odoo-doctor/issues/new?template=false_positive.yml).
+
 ## Contributing
 
-Contributions are welcome, and new checks and false-positive reports especially. See [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
+Contributions are welcome, and new checks and false-positive reports especially. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [issues marked good first issue](https://github.com/MarcRodriguezz/odoo-doctor/labels/good%20first%20issue). To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## License
 

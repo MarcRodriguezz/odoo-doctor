@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/MarcRodriguezz/odoo-doctor/security/advisories/new
+    about: Please report vulnerabilities privately, not in a public issue.
+  - name: Ask a question
+    url: https://github.com/MarcRodriguezz/odoo-doctor/discussions
+    about: For questions about using odoo-doctor or reading a report.

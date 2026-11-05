@@ -1,0 +1,26 @@
+name: Idea for a check
+description: Something odoo-doctor should detect.
+labels: ["new check"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What should it detect, and what harm does it cause?
+    validations:
+      required: true
+  - type: textarea
+    id: detect
+    attributes:
+      label: How can it be detected without changing anything?
+      description: For example a read-only SQL query, a configuration value or a code pattern.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: For removed or deprecated Odoo APIs, link to the Odoo source that shows it.
+  - type: textarea
+    id: fix
+    attributes:
+      label: How should someone fix it?
